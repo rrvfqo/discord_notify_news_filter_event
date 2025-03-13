@@ -1,0 +1,28 @@
+name: Run Python filter news Every 30 minutes
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # 每30分鐘執行一次 (注意：此時間為 UTC 時間)
+  workflow_dispatch:        # 允許手動觸發
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # 指定你使用的 Python 版本，例如 '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests schedule beautifulsoup4
+
+      - name: Run the script
+        run: |
+          python run.py   # 將 'run.py' 換成你要執行的程式檔案名稱

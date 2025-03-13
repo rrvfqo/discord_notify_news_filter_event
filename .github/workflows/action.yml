@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests schedule beautifulsoup4 lxml
+          pip install requests schedule beautifulsoup4 xml
 
       - name: Run the script
         run: |

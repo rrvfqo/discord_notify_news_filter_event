@@ -28,7 +28,7 @@ last_checked_date = datetime.now().strftime('%Y%m%d')
 
 def check_new_big_news():
     global last_checked_date
-    today = datetime.now().strftime('%Y%m%d')
+    today = datetime.now(datetime.timezone.utc).strftime('%Y%m%d')
     
     # 如果跨日，清空 sent_announcements
     if today != last_checked_date:
@@ -38,7 +38,7 @@ def check_new_big_news():
     # new_big_news = get_big_news()
     new_big_news = analyze_big_news_page()
 
-    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_time = datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
    
     if new_big_news:
         # 處理新公告，例如發送通知
@@ -166,6 +166,11 @@ def analyze_big_news_page():
     # print(f'big_news_list = {big_news_list}')
     # print(f'outoftheRed_list = {outoftheRed_list}') 
     # print(f'supervisor_change_list = {supervisor_change_list}')
+
+    # 倒轉列表順序
+    big_news_list.reverse()
+    outoftheRed_list.reverse()
+    supervisor_change_list.reverse()
 
     return {
         'big_news': big_news_list,

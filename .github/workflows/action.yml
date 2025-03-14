@@ -1,8 +1,8 @@
-name: Run Python filter news Every 30 minutes
+name: Run Python filter news Every 1 hour
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # 每30分鐘執行一次 (注意：此時間為 UTC 時間)
+    - cron: '0 * * * *'   # 每1小時執行一次 (注意：此時間為 UTC 時間)
   workflow_dispatch:        # 允許手動觸發
 
 jobs:

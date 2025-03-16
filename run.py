@@ -59,7 +59,7 @@ def generate_msg():
     else:
         print("重大 is none.")
 
-    time.sleep(10)
+    time.sleep(3)
 
     if new_announcements['outoftheRed']:
         msg_outoftheRed = '\n\n'.join(
@@ -77,7 +77,7 @@ def generate_msg():
     else:
         print("自結 is none.")
 
-    time.sleep(10)
+    time.sleep(3)
 
     if new_announcements['supervisor_change']:
         msg_supervisor_change = '\n\n'.join(

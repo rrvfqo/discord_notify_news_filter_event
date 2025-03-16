@@ -37,10 +37,11 @@ def check_new_big_news():
 
     # new_big_news = get_big_news()
     new_big_news = analyze_big_news_page()
+    print(f"new_big_news = {new_big_news}")
 
     current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
    
-    if new_big_news:
+    if any(new_big_news[key] for key in new_big_news):
         # 處理新公告，例如發送通知
         print(f"有新的公告 - {current_time}")
         # for news in new_big_news:
@@ -130,7 +131,7 @@ def analyze_big_news_page():
 
         # 訪問每個 link 的網址並檢查其說明項內容
         link_response = requests.get(link)
-        link_soup = BeautifulSoup(link_response.content, 'html.parser')
+        link_soup = BeautifulSoup(link_response.content, 'lxml-xml')
         link_description = link_soup.get_text()
         # print(link_description)
 
@@ -163,14 +164,14 @@ def analyze_big_news_page():
         # 記錄已發送的重大訊息
         sent_big_news.add(news_id)
 
-    # print(f'big_news_list = {big_news_list}')
-    # print(f'outoftheRed_list = {outoftheRed_list}') 
-    # print(f'supervisor_change_list = {supervisor_change_list}')
+    print(f'big_news_list = {big_news_list}')
+    print(f'outoftheRed_list = {outoftheRed_list}') 
+    print(f'supervisor_change_list = {supervisor_change_list}')
 
     # 倒轉列表順序
-    big_news_list.reverse()
-    outoftheRed_list.reverse()
-    supervisor_change_list.reverse()
+    # big_news_list.reverse()
+    # outoftheRed_list.reverse()
+    # supervisor_change_list.reverse()
 
     return {
         'big_news': big_news_list,
@@ -189,6 +190,6 @@ def analyze_big_news_page():
 
 if __name__ == '__main__':
    
-   analyze_big_news_page()
+   check_new_big_news()
    
 #    filter_big_news(news_list)

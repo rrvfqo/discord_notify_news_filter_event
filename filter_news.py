@@ -23,8 +23,11 @@ big_news_url = "https://mopsov.twse.com.tw/nas/rss/mopsrss201001.xml"
 # 紀錄已發送的重大訊息
 sent_big_news = set()
 
+# 紀錄已訪問的連結
+visited_links = set()
+
 # 紀錄上次檢查日期
-last_checked_date = datetime.now().strftime('%Y%m%d')
+last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
 
 def check_new_big_news():
     global last_checked_date
@@ -33,9 +36,9 @@ def check_new_big_news():
     # 如果跨日，清空 sent_announcements
     if today != last_checked_date:
         sent_big_news.clear()
+        visited_links.clear()
         last_checked_date = today
 
-    # new_big_news = get_big_news()
     new_big_news = analyze_big_news_page()
     print(f"new_big_news = {new_big_news}")
 
@@ -53,12 +56,11 @@ def check_new_big_news():
 
 def analyze_big_news_page():
     # 取得今天的日期
-    today = datetime.now().date()
+    today = datetime.now(timezone.utc).date()
 
     # 發送請求並取得網頁內容
     response = requests.get(big_news_url)
     soup = BeautifulSoup(response.content, 'xml')
-    print(soup)
 
     # 初始化 分類結果
     big_news_list = []
@@ -74,19 +76,18 @@ def analyze_big_news_page():
         else:
             print("Warning: Missing title in item")
             print(item)
-            # sys.exit("Error: Missing title in item. Program terminated.")
-            continue
-
+            sys.exit("Error: Missing title in item. Program terminated.")
 
         link_tag = item.find('link')
         if link_tag and link_tag.string:
             link = link_tag.string.strip()
-            # print(link)
-            # ...existing code...
         else:
             print(f"Warning: Missing link in item")
             print(item)
-            # sys.exit("Error: Missing link in item. Program terminated.")
+            sys.exit("Error: Missing link in item. Program terminated.")
+
+        # 檢查是否已經訪問過該連結
+        if link in visited_links:
             continue
 
         description_tag = item.find('description')
@@ -94,9 +95,8 @@ def analyze_big_news_page():
             description = description_tag.get_text().strip()
         else:
             print("Warning: Missing description in item")
-            print(item) 
-            #sys.exit("Error: Missing description in item. Program terminated.")
-            continue
+            print(item)
+            sys.exit("Error: Missing description in item. Program terminated.")
 
         pub_date_tag = item.find('pubDate')
         if pub_date_tag:
@@ -106,14 +106,10 @@ def analyze_big_news_page():
         else:
             print("Warning: Missing pubDate in item")
             print(item)
-            #sys.exit("Error: Missing pubDate in item. Program terminated.")
-            continue
+            sys.exit("Error: Missing pubDate in item. Program terminated.")
 
-        
         # 提取股票代碼和公司名稱
         stock_id, company_name = title.split(')')[0].split('(')[1], title.split(')')[1].split('-')[0].strip()
-
-        # print(f"股票代碼: {stock_id}, 公司名稱: {company_name}, 發佈日期: {pub_date}, 主旨: {description}, 公告連結: {link}")
 
         # 過濾時間不是今天的項目
         pub_date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S').date()
@@ -134,7 +130,6 @@ def analyze_big_news_page():
         link_response = requests.get(link)
         link_soup = BeautifulSoup(link_response.content, 'lxml')
         link_description = link_soup.get_text()
-        # print(f"link_description = {link_description}")
 
         # 檢查是否符合關鍵字
         if any(keyword in link_description for keyword in keywords_big_news):
@@ -164,15 +159,13 @@ def analyze_big_news_page():
 
         # 記錄已發送的重大訊息
         sent_big_news.add(news_id)
-
-    # print(f'big_news_list = {big_news_list}')
-    # print(f'outoftheRed_list = {outoftheRed_list}') 
-    # print(f'supervisor_change_list = {supervisor_change_list}')
+        # 記錄已訪問的連結
+        visited_links.add(link)
 
     # 倒轉列表順序
-    # big_news_list.reverse()
-    # outoftheRed_list.reverse()
-    # supervisor_change_list.reverse()
+    big_news_list.reverse()
+    outoftheRed_list.reverse()
+    supervisor_change_list.reverse()
 
     return {
         'big_news': big_news_list,
@@ -180,17 +173,5 @@ def analyze_big_news_page():
         'supervisor_change': supervisor_change_list
     }
 
-# def filter_big_news(news_list):
-#     return
-
-# def filter_outoftheRed(news_list):
-#     return
-
-# def filter_supervisor_change(news_list):
-#     return
-
 if __name__ == '__main__':
-   
-   check_new_big_news()
-   
-#    filter_big_news(news_list)
+    check_new_big_news()

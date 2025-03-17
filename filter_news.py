@@ -58,6 +58,7 @@ def analyze_big_news_page():
     # 發送請求並取得網頁內容
     response = requests.get(big_news_url)
     soup = BeautifulSoup(response.content, 'xml')
+    print(soup)
 
     # 初始化 分類結果
     big_news_list = []
@@ -131,9 +132,9 @@ def analyze_big_news_page():
 
         # 訪問每個 link 的網址並檢查其說明項內容
         link_response = requests.get(link)
-        link_soup = BeautifulSoup(link_response.content, 'lxml-xml')
+        link_soup = BeautifulSoup(link_response.content, 'lxml')
         link_description = link_soup.get_text()
-        # print(link_description)
+        # print(f"link_description = {link_description}")
 
         # 檢查是否符合關鍵字
         if any(keyword in link_description for keyword in keywords_big_news):
@@ -164,9 +165,9 @@ def analyze_big_news_page():
         # 記錄已發送的重大訊息
         sent_big_news.add(news_id)
 
-    print(f'big_news_list = {big_news_list}')
-    print(f'outoftheRed_list = {outoftheRed_list}') 
-    print(f'supervisor_change_list = {supervisor_change_list}')
+    # print(f'big_news_list = {big_news_list}')
+    # print(f'outoftheRed_list = {outoftheRed_list}') 
+    # print(f'supervisor_change_list = {supervisor_change_list}')
 
     # 倒轉列表順序
     # big_news_list.reverse()

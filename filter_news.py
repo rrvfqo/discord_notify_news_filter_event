@@ -6,7 +6,8 @@ import requests
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup 
 import re  
-# import sys
+import json
+import os
 
 # 關鍵字
 keywords_big_news = ['併購', '擴廠', '增資', '發債', '擴廠', '減資', '合併', '分割', '重組', '購買', 
@@ -21,10 +22,22 @@ keywords_supervisor_change = ['董事長異動', '總經理異動', '董事異�
 big_news_url = "https://mopsov.twse.com.tw/nas/rss/mopsrss201001.xml"
 
 # 紀錄已發送的重大訊息
-sent_big_news = set()
+sent_big_news_file = 'sent_big_news.json'
+visited_links_file = 'visited_links.json'
 
-# 紀錄已訪問的連結
-visited_links = set()
+# 讀取已發送的重大訊息
+if os.path.exists(sent_big_news_file):
+    with open(sent_big_news_file, 'r') as f:
+        sent_big_news = set(json.load(f))
+else:
+    sent_big_news = set()
+
+# 讀取已訪問的連結
+if os.path.exists(visited_links_file):
+    with open(visited_links_file, 'r') as f:
+        visited_links = set(json.load(f))
+else:
+    visited_links = set()
 
 # 紀錄上次檢查日期
 last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
@@ -39,8 +52,14 @@ def check_new_big_news():
         visited_links.clear()
         last_checked_date = today
 
+         # 清空檔案內容
+        with open(sent_big_news_file, 'w') as f:
+            json.dump(list(sent_big_news), f)
+        with open(visited_links_file, 'w') as f:
+            json.dump(list(visited_links), f)
+
     new_big_news = analyze_big_news_page()
-    print(f"new_big_news = {new_big_news}")
+    # print(f"new_big_news = {new_big_news}")
 
     current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
    
@@ -51,6 +70,12 @@ def check_new_big_news():
         #     print(news)
     else:
         print(f"沒有新的公告 - {current_time}")
+
+    # 將已發送的重大訊息和已訪問的連結存儲到檔案中
+    with open(sent_big_news_file, 'w') as f:
+        json.dump(list(sent_big_news), f)
+    with open(visited_links_file, 'w') as f:
+        json.dump(list(visited_links), f)
 
     return new_big_news
 
@@ -76,7 +101,7 @@ def analyze_big_news_page():
         else:
             print("Warning: Missing title in item")
             print(item)
-            sys.exit("Error: Missing title in item. Program terminated.")
+            # sys.exit("Error: Missing title in item. Program terminated.")
 
         link_tag = item.find('link')
         if link_tag and link_tag.string:
@@ -84,7 +109,7 @@ def analyze_big_news_page():
         else:
             print(f"Warning: Missing link in item")
             print(item)
-            sys.exit("Error: Missing link in item. Program terminated.")
+            # sys.exit("Error: Missing link in item. Program terminated.")
 
         # 檢查是否已經訪問過該連結
         if link in visited_links:
@@ -96,7 +121,7 @@ def analyze_big_news_page():
         else:
             print("Warning: Missing description in item")
             print(item)
-            sys.exit("Error: Missing description in item. Program terminated.")
+            # sys.exit("Error: Missing description in item. Program terminated.")
 
         pub_date_tag = item.find('pubDate')
         if pub_date_tag:
@@ -106,7 +131,7 @@ def analyze_big_news_page():
         else:
             print("Warning: Missing pubDate in item")
             print(item)
-            sys.exit("Error: Missing pubDate in item. Program terminated.")
+            # sys.exit("Error: Missing pubDate in item. Program terminated.")
 
         # 提取股票代碼和公司名稱
         stock_id, company_name = title.split(')')[0].split('(')[1], title.split(')')[1].split('-')[0].strip()

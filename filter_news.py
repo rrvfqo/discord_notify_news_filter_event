@@ -24,11 +24,13 @@ big_news_url = "https://mopsov.twse.com.tw/nas/rss/mopsrss201001.xml"
 # 紀錄已發送的重大訊息
 sent_big_news_file = 'sent_big_news.json'
 visited_links_file = 'visited_links.json'
+last_checked_date_file = 'last_checked_date.txt'
 
 # 讀取已發送的重大訊息
 if os.path.exists(sent_big_news_file):
     with open(sent_big_news_file, 'r') as f:
         sent_big_news = set(json.load(f))
+        print(f"sent_big_news = {sent_big_news}")
 else:
     sent_big_news = set()
 
@@ -36,11 +38,16 @@ else:
 if os.path.exists(visited_links_file):
     with open(visited_links_file, 'r') as f:
         visited_links = set(json.load(f))
+        print(f"visited_links = {visited_links}")
 else:
     visited_links = set()
 
-# 紀錄上次檢查日期
-last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
+# 讀取上次檢查日期
+if os.path.exists(last_checked_date_file):
+    with open(last_checked_date_file, 'r') as f:
+        last_checked_date = f.read().strip()
+else:
+    last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
 
 def check_new_big_news():
     global last_checked_date
@@ -57,6 +64,8 @@ def check_new_big_news():
             json.dump(list(sent_big_news), f)
         with open(visited_links_file, 'w') as f:
             json.dump(list(visited_links), f)
+        with open(last_checked_date_file, 'w') as f:
+            f.write(last_checked_date)
 
     new_big_news = analyze_big_news_page()
     # print(f"new_big_news = {new_big_news}")

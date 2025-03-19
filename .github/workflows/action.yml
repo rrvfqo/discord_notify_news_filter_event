@@ -24,6 +24,7 @@ jobs:
           path: |
             sent_big_news.json
             visited_links.json
+            last_checked_date.txt
           key: ${{ runner.os }}-cache
 
       - name: Install dependencies
@@ -41,4 +42,5 @@ jobs:
           path: |
             sent_big_news.json
             visited_links.json
+            last_checked_date.txt
           key: ${{ runner.os }}-cache

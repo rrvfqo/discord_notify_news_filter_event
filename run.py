@@ -1,4 +1,4 @@
-import schedule
+
 import time
 # import threading
 # import signal
@@ -96,31 +96,8 @@ def generate_msg():
         print("主管異動 is none.")
 
 
-# def job():
-     
-    # msg = generate_msg()
-    # if msg is None:
-    #     print("No new announcements.")
-    #     return
-    #   # 如果msg超過2000字元，分段發送
-    # if len(msg) > 2000:
-    #     msg_list = [msg[i:i+2000] for i in range(0, len(msg), 2000)]
-    #     for msg in msg_list:
-    #         notify_discord_webhook(msg)
-    #     return
-    # else:
-    #     notify_discord_webhook(msg)
 
-schedule.every(30).minutes.do(generate_msg)
-# schedule.every(30).seconds.do(job)
 
-def run_schedule():
-    while True:
-        try:
-            schedule.run_pending()
-        except Exception as e:
-            print(f"Error running scheduled job: {e}")
-        time.sleep(1)
 
 def signal_handler(sig, frame):
     global running
@@ -131,13 +108,3 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
 
     generate_msg()  # 執行一次
-
-    # # 設定停止信號處理
-    # signal.signal(signal.SIGINT, signal_handler)
-
-    # # 初始化 running 變數
-    # running = True
-
-    # # 啟動定時任務的背景執行緒
-    # schedule_thread = threading.Thread(target=run_schedule)
-    # schedule_thread.start()

@@ -28,17 +28,25 @@ last_checked_date_file = 'last_checked_date.txt'
 
 # 讀取已發送的重大訊息
 if os.path.exists(sent_big_news_file):
-    with open(sent_big_news_file, 'r') as f:
-        sent_big_news = set(json.load(f))
-        print(f"sent_big_news = {sent_big_news}")
+    try:
+        with open(sent_big_news_file, 'r') as f:
+            sent_big_news = set(json.load(f))
+            print(f"sent_big_news = {sent_big_news}")
+    except json.JSONDecodeError:
+        print(f"Warning: {sent_big_news_file} is empty or invalid. Initializing empty set.")
+        sent_big_news = set()
 else:
     sent_big_news = set()
 
 # 讀取已訪問的連結
 if os.path.exists(visited_links_file):
-    with open(visited_links_file, 'r') as f:
-        visited_links = set(json.load(f))
-        print(f"visited_links = {visited_links}")
+    try:
+        with open(visited_links_file, 'r') as f:
+            visited_links = set(json.load(f))
+            print(f"visited_links = {visited_links}")
+    except json.JSONDecodeError:
+        print(f"Warning: {visited_links_file} is empty or invalid. Initializing empty set.")
+        visited_links = set()
 else:
     visited_links = set()
 

@@ -156,7 +156,7 @@ def analyze_big_news_page():
             continue
 
         # 檢查是否已經發送過
-        news_id = stock_id + description
+        news_id = stock_id + description + pub_date
         if news_id in sent_big_news:
             continue
 

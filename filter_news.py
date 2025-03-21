@@ -56,6 +56,8 @@ if os.path.exists(last_checked_date_file):
         last_checked_date = f.read().strip()
 else:
     last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
+    with open(last_checked_date_file, 'w') as f:
+        f.write(last_checked_date)
 
 def check_new_big_news():
     global last_checked_date
@@ -91,8 +93,10 @@ def check_new_big_news():
     # 將已發送的重大訊息和已訪問的連結存儲到檔案中
     with open(sent_big_news_file, 'w') as f:
         json.dump(list(sent_big_news), f)
+        print(f"Updated {sent_big_news_file} with {list(sent_big_news)}")
     with open(visited_links_file, 'w') as f:
         json.dump(list(visited_links), f)
+        print(f"Updated {visited_links_file} with {list(visited_links)}")
 
     return new_big_news
 

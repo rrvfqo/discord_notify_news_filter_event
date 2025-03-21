@@ -105,45 +105,50 @@ def analyze_big_news_page():
     items = soup.find_all('item')
     for item in items:
         title_tag = item.find('title')
-        if title_tag:
+        if title_tag and title_tag.get_text():
             title = title_tag.get_text()
         else:
-            print("Warning: Missing title in item")
+            print("Warning: Missing or empty title in item")
             print(item)
-            # sys.exit("Error: Missing title in item. Program terminated.")
+            continue
 
         link_tag = item.find('link')
         if link_tag and link_tag.string:
             link = link_tag.string.strip()
         else:
-            print(f"Warning: Missing link in item")
+            print(f"Warning: Missing or empty link in item")
             print(item)
-            # sys.exit("Error: Missing link in item. Program terminated.")
+            continue
 
         # 檢查是否已經訪問過該連結
         if link in visited_links:
             continue
 
         description_tag = item.find('description')
-        if description_tag:
+        if description_tag and description_tag.get_text():
             description = description_tag.get_text().strip()
         else:
-            print("Warning: Missing description in item")
+            print("Warning: Missing or empty description in item")
             print(item)
-            # sys.exit("Error: Missing description in item. Program terminated.")
+            continue
 
         pub_date_tag = item.find('pubDate')
-        if pub_date_tag:
+        if pub_date_tag and pub_date_tag.get_text():
             pub_date = pub_date_tag.get_text().strip()
             # 去掉 pub_date 中的 +0800
             pub_date = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z').strftime('%a, %d %b %Y %H:%M:%S')
         else:
-            print("Warning: Missing pubDate in item")
+            print("Warning: Missing or empty pubDate in item")
             print(item)
-            # sys.exit("Error: Missing pubDate in item. Program terminated.")
+            continue
 
         # 提取股票代碼和公司名稱
-        stock_id, company_name = title.split(')')[0].split('(')[1], title.split(')')[1].split('-')[0].strip()
+        try:
+            stock_id, company_name = title.split(')')[0].split('(')[1], title.split(')')[1].split('-')[0].strip()
+        except IndexError:
+            print("Warning: Title format is incorrect")
+            print(item)
+            continue
 
         # 過濾時間不是今天的項目
         pub_date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S').date()

@@ -67,7 +67,7 @@ jobs:
 
       - name: Run script
         run: |
-          python /path/to/your/script/filter_news.py
+          python run.py
 
       - name: Commit and push changes
         run: |

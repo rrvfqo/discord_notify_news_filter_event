@@ -67,7 +67,7 @@ jobs:
 
       - name: Run script
         run: |
-          python run.py
+          python filter_news.py
 
       - name: Commit and push changes
         run: |

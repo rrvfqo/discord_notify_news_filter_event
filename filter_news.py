@@ -221,7 +221,7 @@ def analyze_big_news_page():
 
     print(f"big_news_list = {big_news_list}")
     print(f"outoftheRed_list = {outoftheRed_list}")
-    print(f"supervisor_change_list = {supervisor_change_list")
+    print(f"supervisor_change_list = {supervisor_change_list}")
 
     return {
         'big_news': big_news_list,

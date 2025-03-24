@@ -48,6 +48,12 @@ jobs:
             last_checked_date.txt
           key: ${{ runner.os }}-cache
 
+      - name: Ignore pycache
+        run: |
+          echo "__pycache__/" >> .gitignore
+          git rm -r --cached __pycache__/
+          git add .gitignore
+
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'

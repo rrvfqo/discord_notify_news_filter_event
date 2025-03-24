@@ -37,7 +37,7 @@ jobs:
 
       - name: Run the script
         run: |
-          python run.py   # 將 'run.py' 換成你要執行的程式檔案名稱
+          python filter_news.py   # 將 'run.py' 換成你要執行的程式檔案名稱
 
       - name: Save cache
         uses: actions/cache@v3
@@ -76,3 +76,6 @@ jobs:
           git add sent_big_news.json visited_links.json
           git commit -m 'Update news files'
           git push
+        
+
+    

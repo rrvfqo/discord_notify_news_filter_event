@@ -43,7 +43,7 @@ if os.path.exists(visited_links_file):
     try:
         with open(visited_links_file, 'r') as f:
             visited_links = set(json.load(f))
-            print(f"visited_links = {visited_links}")
+            # print(f"visited_links = {visited_links}")
     except json.JSONDecodeError:
         print(f"Warning: {visited_links_file} is empty or invalid. Initializing empty set.")
         visited_links = set()
@@ -54,6 +54,7 @@ else:
 if os.path.exists(last_checked_date_file):
     with open(last_checked_date_file, 'r') as f:
         last_checked_date = f.read().strip()
+        print(f"last_checked_date = {last_checked_date}")
 else:
     last_checked_date = datetime.now(timezone.utc).strftime('%Y%m%d')
     with open(last_checked_date_file, 'w') as f:
@@ -217,6 +218,10 @@ def analyze_big_news_page():
     big_news_list.reverse()
     outoftheRed_list.reverse()
     supervisor_change_list.reverse()
+
+    print(f"big_news_list = {big_news_list}")
+    print(f"outoftheRed_list = {outoftheRed_list}")
+    print(f"supervisor_change_list = {supervisor_change_list")
 
     return {
         'big_news': big_news_list,

@@ -69,7 +69,7 @@ def check_new_big_news():
     # 將已訪問的連結存儲到檔案中
     with open(visited_links_file, 'w') as f:
         f.write("\n".join(visited_links))
-        # print(f"Updated {visited_links_file} with {list(visited_links)}")
+        print(f"Updated {visited_links_file} with {list(visited_links)}")
 
     return new_big_news
 

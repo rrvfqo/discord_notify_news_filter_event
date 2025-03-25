@@ -51,7 +51,9 @@ jobs:
       - name: Ignore pycache
         run: |
           echo "__pycache__/" >> .gitignore
-          git rm -r --cached __pycache__/
+          if [ -d "__pycache__/" ]; then
+            git rm -r --cached __pycache__/
+          fi
           git add .gitignore
 
       - name: Commit and push changes

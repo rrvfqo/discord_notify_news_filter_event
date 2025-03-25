@@ -52,11 +52,12 @@ jobs:
         run: |
           if ! grep -qx "__pycache__/" .gitignore; then
             echo "__pycache__/" >> .gitignore
+            git add .gitignore
+            git commit -m 'Update .gitignore to ignore __pycache__'
           fi
           if [ -d "__pycache__/" ]; then
             git rm -r --cached __pycache__/
           fi
-          git add .gitignore
 
       - name: Commit and push changes
         run: |

@@ -36,7 +36,7 @@ jobs:
 
       - name: Run the script
         run: |
-          python filter_news.py   # 將 'run.py' 換成你要執行的程式檔案名稱
+          python run.py   # 將 'run.py' 換成你要執行的程式檔案名稱
 
       - name: Save cache
         uses: actions/cache@v3

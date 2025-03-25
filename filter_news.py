@@ -6,7 +6,6 @@ import requests
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup 
 import re  
-import json
 import os
 
 # 關鍵字
@@ -21,32 +20,14 @@ keywords_supervisor_change = ['董事長異動', '總經理異動', '董事異�
 # 公開資訊觀測站、即時重大訊息網站
 big_news_url = "https://mopsov.twse.com.tw/nas/rss/mopsrss201001.xml"
 
-# 紀錄已發送的重大訊息
-sent_big_news_file = 'sent_big_news.json'
-visited_links_file = 'visited_links.json'
+# 紀錄已訪問的連結
+visited_links_file = 'visited_links.txt'
 last_checked_date_file = 'last_checked_date.txt'
-
-# 讀取已發送的重大訊息
-if os.path.exists(sent_big_news_file):
-    try:
-        with open(sent_big_news_file, 'r') as f:
-            sent_big_news = set(json.load(f))
-            print(f"sent_big_news = {sent_big_news}")
-    except json.JSONDecodeError:
-        print(f"Warning: {sent_big_news_file} is empty or invalid. Initializing empty set.")
-        sent_big_news = set()
-else:
-    sent_big_news = set()
 
 # 讀取已訪問的連結
 if os.path.exists(visited_links_file):
-    try:
-        with open(visited_links_file, 'r') as f:
-            visited_links = set(json.load(f))
-            # print(f"visited_links = {visited_links}")
-    except json.JSONDecodeError:
-        print(f"Warning: {visited_links_file} is empty or invalid. Initializing empty set.")
-        visited_links = set()
+    with open(visited_links_file, 'r') as f:
+        visited_links = set(f.read().splitlines())
 else:
     visited_links = set()
 
@@ -64,40 +45,31 @@ def check_new_big_news():
     global last_checked_date
     today = datetime.now(timezone.utc).strftime('%Y%m%d')
     
-    # 如果跨日，清空 sent_announcements
+    # 如果跨日，清空 visited_links
     if today != last_checked_date:
-        sent_big_news.clear()
         visited_links.clear()
         last_checked_date = today
 
-         # 清空檔案內容
-        with open(sent_big_news_file, 'w') as f:
-            json.dump(list(sent_big_news), f)
+        # 清空檔案內容
         with open(visited_links_file, 'w') as f:
-            json.dump(list(visited_links), f)
+            f.write("")
         with open(last_checked_date_file, 'w') as f:
             f.write(last_checked_date)
 
     new_big_news = analyze_big_news_page()
-    # print(f"new_big_news = {new_big_news}")
 
     current_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
    
     if any(new_big_news[key] for key in new_big_news):
         # 處理新公告，例如發送通知
         print(f"有新的公告 - {current_time}")
-        # for news in new_big_news:
-        #     print(news)
     else:
         print(f"沒有新的公告 - {current_time}")
 
-    # 將已發送的重大訊息和已訪問的連結存儲到檔案中
-    with open(sent_big_news_file, 'w') as f:
-        json.dump(list(sent_big_news), f)
-        print(f"Updated {sent_big_news_file} with {list(sent_big_news)}")
+    # 將已訪問的連結存儲到檔案中
     with open(visited_links_file, 'w') as f:
-        json.dump(list(visited_links), f)
-        print(f"Updated {visited_links_file} with {list(visited_links)}")
+        f.write("\n".join(visited_links))
+        # print(f"Updated {visited_links_file} with {list(visited_links)}")
 
     return new_big_news
 
@@ -117,6 +89,31 @@ def analyze_big_news_page():
     # 解析網頁中的每個 item
     items = soup.find_all('item')
     for item in items:
+        pub_date_tag = item.find('pubDate')
+        if pub_date_tag and pub_date_tag.get_text():
+            pub_date = pub_date_tag.get_text().strip()
+            # 去掉 pub_date 中的 +0800
+            pub_date = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z').strftime('%a, %d %b %Y %H:%M:%S')
+            pub_date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S').date()
+            # 過濾時間不是今天的項目
+            if pub_date_obj != today:
+                continue
+        else:
+            print("Warning: Missing or empty pubDate in item")
+            print(item)
+            continue
+
+        link_tag = item.find('link')
+        if link_tag and link_tag.string:
+            link = link_tag.string.strip()
+            # 檢查是否已經訪問過該連結
+            if link in visited_links:
+                continue
+        else:
+            print(f"Warning: Missing or empty link in item")
+            print(item)
+            continue
+
         title_tag = item.find('title')
         if title_tag and title_tag.get_text():
             title = title_tag.get_text()
@@ -125,33 +122,11 @@ def analyze_big_news_page():
             print(item)
             continue
 
-        link_tag = item.find('link')
-        if link_tag and link_tag.string:
-            link = link_tag.string.strip()
-        else:
-            print(f"Warning: Missing or empty link in item")
-            print(item)
-            continue
-
-        # 檢查是否已經訪問過該連結
-        if link in visited_links:
-            continue
-
         description_tag = item.find('description')
         if description_tag and description_tag.get_text():
             description = description_tag.get_text().strip()
         else:
             print("Warning: Missing or empty description in item")
-            print(item)
-            continue
-
-        pub_date_tag = item.find('pubDate')
-        if pub_date_tag and pub_date_tag.get_text():
-            pub_date = pub_date_tag.get_text().strip()
-            # 去掉 pub_date 中的 +0800
-            pub_date = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z').strftime('%a, %d %b %Y %H:%M:%S')
-        else:
-            print("Warning: Missing or empty pubDate in item")
             print(item)
             continue
 
@@ -163,19 +138,9 @@ def analyze_big_news_page():
             print(item)
             continue
 
-        # 過濾時間不是今天的項目
-        pub_date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S').date()
-        if pub_date_obj != today:
-            continue
-
         # 檢查 link 中 "TYPEK=" 之後到第一個 "&" 之間的文字
         typek_match = re.search(r'TYPEK=(.*?)&', link)
         if not typek_match or typek_match.group(1) not in ['otc', 'sii']:
-            continue
-
-        # 檢查是否已經發送過
-        news_id = link
-        if news_id in sent_big_news:
             continue
 
         # 訪問每個 link 的網址並檢查其說明項內容
@@ -209,10 +174,9 @@ def analyze_big_news_page():
                 'title': description
             })
 
-        # 記錄已發送的重大訊息
-        sent_big_news.add(news_id)
         # 記錄已訪問的連結
         visited_links.add(link)
+        print(f"Visited link: {link}")
 
     # 倒轉列表順序
     big_news_list.reverse()
@@ -229,5 +193,5 @@ def analyze_big_news_page():
         'supervisor_change': supervisor_change_list
     }
 
-if __name__ == '__main__':
+if __name__ == '__main__': 
     check_new_big_news()

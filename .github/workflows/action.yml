@@ -25,8 +25,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            sent_big_news.json
-            visited_links.json
+            visited_links.txt
             last_checked_date.txt
           key: ${{ runner.os }}-cache
 
@@ -43,8 +42,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            sent_big_news.json
-            visited_links.json
+            visited_links.txt
             last_checked_date.txt
           key: ${{ runner.os }}-cache
 
@@ -65,7 +63,7 @@ jobs:
         run: |
           git config --global user.name 'rrvfqo'
           git config --global user.email 'rrvfqo@gmail.com'
-          git add sent_big_news.json visited_links.json last_checked_date.txt
+          git add visited_links.txt last_checked_date.txt
           if git diff-index --quiet HEAD; then
             echo "No changes to commit"
           else

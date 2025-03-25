@@ -176,7 +176,9 @@ def analyze_big_news_page():
 
         # 記錄已訪問的連結
         visited_links.add(link)
-        print(f"Visited link: {link}")
+        # print(f"Visited link: {link}")
+
+    print(f"Visited links: {visited_links}")
 
     # 倒轉列表順序
     big_news_list.reverse()

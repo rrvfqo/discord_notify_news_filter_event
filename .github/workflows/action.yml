@@ -37,7 +37,7 @@ jobs:
 
       - name: Run the script
         run: |
-          python run.py   # 將 'run.py' 換成你要執行的程式檔案名稱
+          python filter_news.py   # 將 'run.py' 換成你要執行的程式檔案名稱
 
       - name: Save cache
         uses: actions/cache@v3
@@ -48,18 +48,18 @@ jobs:
             last_checked_date.txt
           key: ${{ runner.os }}-cache
 
-      - name: Ignore pycache
-        run: |
-          git config --global user.name 'rrvfqo'
-          git config --global user.email 'rrvfqo@gmail.com'
-          if ! grep -qx "__pycache__/" .gitignore; then
-            echo "__pycache__/" >> .gitignore
-            git add .gitignore
-            git commit -m 'Update .gitignore to ignore __pycache__'
-          fi
-          if [ -d "__pycache__/" ]; then
-            git rm -r --cached __pycache__/
-          fi
+      # - name: Ignore pycache
+      #   run: |
+      #     git config --global user.name 'rrvfqo'
+      #     git config --global user.email 'rrvfqo@gmail.com'
+      #     if ! grep -qx "__pycache__/" .gitignore; then
+      #       echo "__pycache__/" >> .gitignore
+      #       git add .gitignore
+      #       git commit -m 'Update .gitignore to ignore __pycache__'
+      #     fi
+      #     if [ -d "__pycache__/" ]; then
+      #       git rm -r --cached __pycache__/
+      #     fi
 
       - name: Commit and push changes
         run: |

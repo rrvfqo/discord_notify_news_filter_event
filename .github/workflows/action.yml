@@ -28,37 +28,4 @@ jobs:
 
       - name: Run the script
         run: |
-          python filter_news.py
-
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            visited_links.txt
-            last_checked_date.txt
-          key: ${{ runner.os }}-cache
-
-      - name: Save cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            visited_links.txt
-            last_checked_date.txt
-          key: ${{ runner.os }}-cache
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name 'rrvfqo'
-          git config --global user.email 'rrvfqo@gmail.com'
-          git add visited_links.txt last_checked_date.txt
-          if git diff-index --quiet HEAD; then
-            echo "No changes to commit"
-          else
-            git commit -m 'Update news files'
-            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
+          python run.py

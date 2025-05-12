@@ -3,6 +3,7 @@
 '''
 
 import requests
+from requests.adapters import HTTPAdapter, Retry
 from datetime import datetime, timezone, timedelta
 from bs4 import BeautifulSoup
 import re
@@ -35,6 +36,17 @@ def check_new_big_news():
 
 
 def analyze_big_news_page():
+
+    # 建立有 retry 的 session
+    session = requests.Session()
+    retries = Retry(
+        total=5,
+        backoff_factor=3,
+        status_forcelist=[502, 503, 504],
+        allowed_methods=["GET"]
+    )
+    session.mount('https://', HTTPAdapter(max_retries=retries))
+
     # 取得當前時間和一小時前的時間
     now = datetime.now(timezone.utc)
     one_hour_ago = now - timedelta(hours=1)
@@ -56,11 +68,11 @@ def analyze_big_news_page():
         if pub_date_tag and pub_date_tag.get_text():
             pub_date = pub_date_tag.get_text().strip()
             pub_date_obj = datetime.strptime(pub_date, '%a, %d %b %Y %H:%M:%S %z')
-            print(f"pub_date_obj = {pub_date_obj}")
+            # print(f"pub_date_obj = {pub_date_obj}")
 
             # 過濾時間不在最近一小時內的項目
             if pub_date_obj < one_hour_ago or pub_date_obj > now:
-                print(f"Skip item with pubDate = {pub_date}")
+                # print(f"Skip item with pubDate = {pub_date}")
                 continue
         else:
             print("Warning: Missing or empty pubDate in item")

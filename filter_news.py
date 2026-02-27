@@ -39,6 +39,12 @@ def analyze_big_news_page():
 
     # 建立有 retry 的 session
     session = requests.Session()
+    
+    # 加入 User-Agent 偽裝成一般瀏覽器，避免被伺服器阻擋
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    })
+    
     retries = Retry(
         total=5,
         backoff_factor=3,
@@ -52,8 +58,8 @@ def analyze_big_news_page():
     one_hour_ago = now - timedelta(hours=1)
     print(f"now = {now}, one_hour_ago = {one_hour_ago}")
 
-    # 發送請求並取得網頁內容
-    response = requests.get(big_news_url)
+    # 發送請求並取得網頁內容 (改用 session.get 並加入 timeout)
+    response = session.get(big_news_url, timeout=15)
     soup = BeautifulSoup(response.content, 'xml')
 
     # 初始化 分類結果
@@ -116,8 +122,8 @@ def analyze_big_news_page():
         if not typek_match or typek_match.group(1) not in ['otc', 'sii']:
             continue
 
-        # 訪問每個 link 的網址並檢查其說明項內容
-        link_response = requests.get(link)
+        # 訪問每個 link 的網址並檢查其說明項內容 (改用 session.get 並加入 timeout)
+        link_response = session.get(link, timeout=15)
         link_soup = BeautifulSoup(link_response.content, 'lxml')
         link_description = link_soup.get_text()
 

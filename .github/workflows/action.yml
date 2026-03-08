@@ -27,5 +27,8 @@ jobs:
           pip install requests beautifulsoup4 lxml
 
       - name: Run the script
+        # 將 env 區塊加在這裡，與 name 和 run 同層級
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           python run.py

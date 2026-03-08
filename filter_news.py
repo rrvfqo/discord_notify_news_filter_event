@@ -59,7 +59,14 @@ def analyze_big_news_page():
     print(f"now = {now}, one_hour_ago = {one_hour_ago}")
 
     # 發送請求並取得網頁內容 (改用 session.get 並加入 timeout)
-    response = session.get(big_news_url, timeout=15)
+    try:
+        response = session.get(big_news_url, timeout=15)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error: Failed to fetch RSS feed. {e}")
+        # 如果主要 RSS 無法取得，就回傳空結果
+        return {'big_news': [], 'outoftheRed': [], 'supervisor_change': []}
+
     soup = BeautifulSoup(response.content, 'xml')
 
     # 初始化 分類結果
@@ -123,9 +130,14 @@ def analyze_big_news_page():
             continue
 
         # 訪問每個 link 的網址並檢查其說明項內容 (改用 session.get 並加入 timeout)
-        link_response = session.get(link, timeout=15)
-        link_soup = BeautifulSoup(link_response.content, 'lxml')
-        link_description = link_soup.get_text()
+        try:
+            link_response = session.get(link, timeout=15)
+            link_response.raise_for_status() # 檢查是否有 HTTP 錯誤碼 (例如 404, 500)
+            link_soup = BeautifulSoup(link_response.content, 'lxml')
+            link_description = link_soup.get_text()
+        except requests.exceptions.RequestException as e:
+            print(f"Warning: Failed to fetch link {link}. Error: {e}")
+            continue
 
         # 檢查是否符合關鍵字
         if any(keyword in link_description for keyword in keywords_big_news):

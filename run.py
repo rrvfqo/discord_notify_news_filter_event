@@ -1,7 +1,6 @@
 
 import time
-# import threading
-# import signal
+import os
 import sys
 import requests
 
@@ -9,7 +8,7 @@ from filter_news import check_new_big_news  # 匯入函式
 
 
 def notify_discord_webhook_big_news(msg):
-    url = 'https://discord.com/api/webhooks/1326482818431193173/dvmxfFzu_oYt-pi93nhN9ZTHMymV2AgAfD14B4eRmbbWbwJuSqrQW-hVuhEyl7UL2pUm'
+    url = os.environ.get("DISCORD_WEBHOOK_URL")
     headers = {"Content-Type": "application/json"}
     data = {"content": msg, "username": "即時重大訊息通知"}
     res = requests.post(url, headers = headers, json = data) 

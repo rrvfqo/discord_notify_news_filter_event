@@ -21,7 +21,10 @@ def notify_discord_webhook_big_news(msg):
             print(f"Request failed with response: {res.status_code}-{res.text}")
 
 def notify_discord_webhook_supervisor_change(msg):
-    url = 'https://discord.com/api/webhooks/1326838042979467295/2ITsRRjDEnCOEPuCvUQJYiB6m_k5N0IueIc4GoGbNd7BVvFPtC9dTSuSmBg7j3vwC1mf'
+    url = os.environ.get("DISCORD_WEBHOOK_URL_SUPERVISOR")
+    if not url:
+        print("錯誤：找不到 DISCORD_WEBHOOK_URL_SUPERVISOR 環境變數或網址為空，無法發送 Discord 通知。")
+        return
     headers = {"Content-Type": "application/json"}
     data = {"content": msg, "username": "稽核主管異動"}
     res = requests.post(url, headers = headers, json = data) 
@@ -31,7 +34,10 @@ def notify_discord_webhook_supervisor_change(msg):
             print(f"Request failed with response: {res.status_code}-{res.text}")
 
 def notify_discord_webhook_outoftheRed(msg):
-    url = 'https://discord.com/api/webhooks/1326843756980338709/c0BI3FICRazJkbkjb02AKKdeLmtvQmdVD-GbDE-SsZClsWcjzmlyBWHGLlOH9Z1C9gHd'
+    url = os.environ.get("DISCORD_WEBHOOK_URL_OUTOFRED")
+    if not url:
+        print("錯誤：找不到 DISCORD_WEBHOOK_URL_OUTOFRED 環境變數或網址為空，無法發送 Discord 通知。")
+        return
     headers = {"Content-Type": "application/json"}
     data = {"content": msg, "username": "自結"}
     res = requests.post(url, headers = headers, json = data) 

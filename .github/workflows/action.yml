@@ -30,5 +30,7 @@ jobs:
         # 將 env 區塊加在這裡，與 name 和 run 同層級
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL_SUPERVISOR: ${{ secrets.DISCORD_WEBHOOK_URL_SUPERVISOR }}
+          DISCORD_WEBHOOK_URL_OUTOFRED: ${{ secrets.DISCORD_WEBHOOK_URL_OUTOFRED }}
         run: |
           python run.py

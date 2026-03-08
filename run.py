@@ -9,6 +9,9 @@ from filter_news import check_new_big_news  # 匯入函式
 
 def notify_discord_webhook_big_news(msg):
     url = os.environ.get("DISCORD_WEBHOOK_URL")
+    if not url:
+        print("錯誤：找不到 DISCORD_WEBHOOK_URL 環境變數或網址為空，無法發送 Discord 通知。")
+        return
     headers = {"Content-Type": "application/json"}
     data = {"content": msg, "username": "即時重大訊息通知"}
     res = requests.post(url, headers = headers, json = data) 

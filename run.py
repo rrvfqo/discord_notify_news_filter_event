@@ -46,6 +46,20 @@ def notify_discord_webhook_outoftheRed(msg):
     else:
             print(f"Request failed with response: {res.status_code}-{res.text}")
 
+def notify_discord_webhook_mou(msg):
+    # 優先從環境變數讀取，若無則使用預設網址
+    url = os.environ.get("DISCORD_WEBHOOK_URL_MOU")
+    if not url:
+        print("錯誤：找不到 DISCORD_WEBHOOK_URL_MOU 環境變數或網址為空，無法發送 Discord 通知。")
+        return
+    headers = {"Content-Type": "application/json"}
+    data = {"content": msg, "username": "MOU/合作備忘錄"}
+    res = requests.post(url, headers = headers, json = data) 
+    if res.status_code in (200, 204):
+            print(f"Request fulfilled with response: {res.text}")
+    else:
+            print(f"Request failed with response: {res.status_code}-{res.text}")
+
 
 
 def generate_msg():
@@ -66,6 +80,24 @@ def generate_msg():
             notify_discord_webhook_big_news(msg_big_news)
     else:
         print("重大 is none.")
+
+    time.sleep(3)
+
+    if new_announcements['mou_news']:
+        msg_mou = '\n\n'.join(
+            f"{announcement['date']}\n{announcement['stock_id']} {announcement['name']}\n{announcement['title']}\n{announcement['url']}"
+            for announcement in new_announcements['mou_news']
+        )
+        
+        # 如果msg超過2000字元，分段發送
+        if len(msg_mou) > 2000:
+            msg_mou_list = [msg_mou[i:i+2000] for i in range(0, len(msg_mou), 2000)]
+            for msg_mou in msg_mou_list:
+                notify_discord_webhook_mou(msg_mou)
+        else:
+            notify_discord_webhook_mou(msg_mou)
+    else:
+        print("MOU is none.")
 
     time.sleep(3)
 

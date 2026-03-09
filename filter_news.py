@@ -11,7 +11,9 @@ import re
 # 關鍵字
 keywords_big_news = ['併購', '擴廠', '增資', '發債', '擴廠', '減資', '合併', '分割', '重組', '購買',
                      '出售', '收購', '取得', '處分', '澄清媒體報導', '自結', '受惠', '減產', '通過投資',
-                     '合作備忘錄', '申報轉讓', '變更每股面額', '第一期', '第二期', '第三期', '盈餘分配', 'MOU']
+                     '申報轉讓', '變更每股面額', '第一期', '第二期', '第三期', '盈餘分配']
+
+keywords_mou = ['合作備忘錄', 'MOU']
 
 keywords_outoftheRed = ['自結', '由虧轉盈']
 
@@ -71,6 +73,7 @@ def analyze_big_news_page():
 
     # 初始化 分類結果
     big_news_list = []
+    mou_list = []
     outoftheRed_list = []
     supervisor_change_list = []
 
@@ -148,6 +151,14 @@ def analyze_big_news_page():
                 'url': link,
                 'title': description
             })
+        if any(keyword in link_description for keyword in keywords_mou):
+            mou_list.append({
+                'stock_id': stock_id,
+                'name': company_name,
+                'date': pub_date,
+                'url': link,
+                'title': description
+            })
         if any(keyword in link_description for keyword in keywords_outoftheRed):
             outoftheRed_list.append({
                 'stock_id': stock_id,
@@ -167,15 +178,18 @@ def analyze_big_news_page():
 
     # 倒轉列表順序
     big_news_list.reverse()
+    mou_list.reverse()
     outoftheRed_list.reverse()
     supervisor_change_list.reverse()
 
     print(f"big_news_list = {big_news_list}")
+    print(f"mou_list = {mou_list}")
     print(f"outoftheRed_list = {outoftheRed_list}")
     print(f"supervisor_change_list = {supervisor_change_list}")
 
     return {
         'big_news': big_news_list,
+        'mou_news': mou_list,
         'outoftheRed': outoftheRed_list,
         'supervisor_change': supervisor_change_list
     }

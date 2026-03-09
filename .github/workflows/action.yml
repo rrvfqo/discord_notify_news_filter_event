@@ -32,5 +32,6 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           DISCORD_WEBHOOK_URL_SUPERVISOR: ${{ secrets.DISCORD_WEBHOOK_URL_SUPERVISOR }}
           DISCORD_WEBHOOK_URL_OUTOFRED: ${{ secrets.DISCORD_WEBHOOK_URL_OUTOFRED }}
+          DISCORD_WEBHOOK_URL_MOU: ${{ secrets.DISCORD_WEBHOOK_URL_MOU }}
         run: |
           python run.py
